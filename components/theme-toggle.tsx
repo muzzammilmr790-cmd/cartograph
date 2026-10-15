@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export type Theme = "system" | "light" | "dark";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("system");
 
-  useEffect(() => {
-    // Read saved theme from localStorage or cookie
-    const saved = (localStorage.getItem("cartograph_theme") as Theme) || "system";
-    setTheme(saved);
-    applyTheme(saved);
-  }, []);
-
-  const applyTheme = (newTheme: Theme) => {
+  const applyTheme = useCallback((newTheme: Theme) => {
     const root = document.documentElement;
     document.cookie = `theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax`;
     localStorage.setItem("cartograph_theme", newTheme);
@@ -30,7 +23,13 @@ export function ThemeToggle() {
       root.classList.add("light");
       root.classList.remove("dark");
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // Read saved theme from localStorage or cookie
+    const saved = (localStorage.getItem("cartograph_theme") as Theme) || "system";
+    applyTheme(saved);
+  }, [applyTheme]);
 
   const handleSelect = (selected: Theme) => {
     setTheme(selected);

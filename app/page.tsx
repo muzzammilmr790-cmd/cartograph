@@ -1,8 +1,21 @@
 import { getOrProvisionCurrentOrg } from "@/lib/org";
+import { syncCurrentOrgToDb, getAnalyses, type AnalysisRecord } from "@/lib/db/analyses";
 import { OrgSync } from "@/components/org-sync";
+import { DashboardView } from "@/components/dashboard-view";
 
 export default async function Home() {
   const currentOrg = await getOrProvisionCurrentOrg();
+
+  // If user is signed in to an org, sync org parent row and fetch analyses via Supabase RLS
+  let analyses: AnalysisRecord[] = [];
+  if (currentOrg) {
+    try {
+      await syncCurrentOrgToDb(currentOrg.orgId, currentOrg.name);
+      analyses = await getAnalyses();
+    } catch (error) {
+      console.error("[Cartograph Page] Org sync / analyses fetch error:", error);
+    }
+  }
 
   return (
     <div className="flex flex-col flex-1 h-[calc(100vh-3rem)] overflow-hidden bg-background text-foreground">
@@ -25,7 +38,7 @@ export default async function Home() {
           )}
         </div>
         <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 text-[11px]">
-          <span>App Shell</span>
+          <span>Analyses: {analyses.length}</span>
           <span className="text-emerald-500 font-medium">● Server Rendered</span>
         </div>
       </div>
@@ -35,26 +48,42 @@ export default async function Home() {
         {/* Left Panel: Repository & File Explorer */}
         <aside className="w-64 border-r border-border bg-surface/50 p-3 flex flex-col gap-3 shrink-0">
           <div className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-500">
-            Repository
+            Analyses Overview
           </div>
-          <div className="border border-dashed border-border rounded p-3 text-xs font-mono text-zinc-400 flex flex-col gap-1">
-            <span>No repository loaded.</span>
-            <span className="text-[11px] text-zinc-500">
-              Paste a public repo URL to generate dependency map.
-            </span>
-          </div>
+          {analyses.length === 0 ? (
+            <div className="border border-dashed border-border rounded p-3 text-xs font-mono text-zinc-400 flex flex-col gap-1">
+              <span>No repositories mapped.</span>
+              <span className="text-[11px] text-zinc-500">
+                Workspace is empty for this team.
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1.5 overflow-y-auto">
+              {analyses.map((a) => (
+                <div
+                  key={a.id}
+                  className="border border-border rounded p-2 text-xs font-mono bg-surface/80 flex flex-col gap-1"
+                >
+                  <span className="font-medium text-foreground truncate">
+                    {a.repo_url.replace("https://github.com/", "")}
+                  </span>
+                  <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                    <span className="capitalize">{a.status}</span>
+                    <span>{a.file_count} files</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </aside>
 
-        {/* Center Panel: Map Canvas Viewport */}
-        <main className="flex-1 bg-background p-4 flex flex-col items-center justify-center relative">
-          <div className="border border-dashed border-border rounded-lg p-8 max-w-md text-center flex flex-col items-center gap-2 bg-surface/30">
-            <div className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
-              Canvas Viewport
-            </div>
-            <p className="text-xs font-mono text-zinc-400">
-              Active workspace for <strong className="text-foreground">{currentOrg?.name}</strong>.
-            </p>
-          </div>
+        {/* Center Panel: Dashboard Viewport */}
+        <main className="flex-1 bg-background flex flex-col overflow-hidden">
+          <DashboardView
+            analyses={analyses}
+            orgName={currentOrg?.name}
+            orgId={currentOrg?.orgId}
+          />
         </main>
 
         {/* Right Panel: Detail & AI Explanation */}
@@ -63,7 +92,7 @@ export default async function Home() {
             Details & Analysis
           </div>
           <div className="border border-dashed border-border rounded p-3 text-xs font-mono text-zinc-400">
-            Select a node or file on the map to inspect dependencies and AI explanations.
+            Select an analysis or node on the map to inspect dependencies and details.
           </div>
         </aside>
       </div>

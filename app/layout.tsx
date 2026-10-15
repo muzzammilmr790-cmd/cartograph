@@ -76,6 +76,10 @@ export default async function RootLayout({
                         rootBox: "flex items-center",
                         organizationSwitcherTrigger:
                           "px-2 py-1 text-xs font-mono font-medium rounded hover:bg-surface-hover text-foreground cursor-pointer transition-colors border border-border",
+                        organizationPreviewMainIdentifier:
+                          "text-foreground text-xs font-mono font-medium",
+                        organizationSwitcherTriggerIcon:
+                          "text-foreground opacity-70",
                       },
                     }}
                   />
