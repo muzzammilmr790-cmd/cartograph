@@ -113,3 +113,35 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--surface-hover) transparent;
 }
+
+/* Node Scrollbar for Folder Nodes */
+.node-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 120, 128, 0.4) transparent;
+}
+
+.node-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.node-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.node-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(120, 120, 128, 0.35);
+  border-radius: 9999px;
+  transition: background-color 0.15s ease;
+}
+
+.node-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+}
+
+html.dark .node-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+html.dark .node-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+}

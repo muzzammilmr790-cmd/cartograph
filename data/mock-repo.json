@@ -20,8 +20,8 @@
       "id": "app/preview/page.tsx",
       "path": "app/preview/page.tsx",
       "folder": "app/preview",
-      "lineCount": 49,
-      "hash": "736db3eeafce2d2b4575fc4efb5342caa012a18ae7645bf1297a435e894aeece",
+      "lineCount": 56,
+      "hash": "53ae3593215a9661cb2a13986f53650c6d3775d8443c08543d6fbfbf6462d1b5",
       "moduleName": "page"
     },
     {
@@ -39,6 +39,30 @@
       "lineCount": 10,
       "hash": "615a61173dd1e0cfe214e5dbde10f1bbe06bb401b778716ecba104d66ee60824",
       "moduleName": "page"
+    },
+    {
+      "id": "components/canvas/clamped-edge.tsx",
+      "path": "components/canvas/clamped-edge.tsx",
+      "folder": "components/canvas",
+      "lineCount": 28,
+      "hash": "cf5c87fb963c97a794f0b56f87638c20c695e6c040dd96ac66fb7f9f55243d6e",
+      "moduleName": "clamped-edge"
+    },
+    {
+      "id": "components/canvas/folder-node.tsx",
+      "path": "components/canvas/folder-node.tsx",
+      "folder": "components/canvas",
+      "lineCount": 156,
+      "hash": "2dc5e9ac4dad3224a100ee78e24e1739314a80f9dae362db347bf4cefe492d74",
+      "moduleName": "folder-node"
+    },
+    {
+      "id": "components/canvas/graph-canvas.tsx",
+      "path": "components/canvas/graph-canvas.tsx",
+      "folder": "components/canvas",
+      "lineCount": 275,
+      "hash": "3fd8ca55af96596e6e6cfd72955eddbdec98ca6fdbc50e2a2ec642115e74d15b",
+      "moduleName": "graph-canvas"
     },
     {
       "id": "components/dashboard-view.tsx",
@@ -65,11 +89,27 @@
       "moduleName": "theme-toggle"
     },
     {
+      "id": "components/workspace/detail-pane.tsx",
+      "path": "components/workspace/detail-pane.tsx",
+      "folder": "components/workspace",
+      "lineCount": 358,
+      "hash": "50c5db7ab542d6956ce70376c5159047dc058569c383ef2a0907e67faae76ceb",
+      "moduleName": "detail-pane"
+    },
+    {
+      "id": "components/workspace/workspace.tsx",
+      "path": "components/workspace/workspace.tsx",
+      "folder": "components/workspace",
+      "lineCount": 56,
+      "hash": "fffd14b8daec3d2598086527c8e82a79a8772043a4002366de2083b7a06054d3",
+      "moduleName": "workspace"
+    },
+    {
       "id": "eslint.config.mjs",
       "path": "eslint.config.mjs",
       "folder": ".",
-      "lineCount": 19,
-      "hash": "870f1adccecf3051cbcd9fd307cef51d7633cf510979c181a81f4b1797273493",
+      "lineCount": 20,
+      "hash": "3f1e5fc0c4505ada6c23c7f03e190b8868bab9191f37d13c594fb470c3c7dcc0",
       "moduleName": "eslint.config"
     },
     {
@@ -97,6 +137,30 @@
       "moduleName": "env"
     },
     {
+      "id": "lib/graph/classify.ts",
+      "path": "lib/graph/classify.ts",
+      "folder": "lib/graph",
+      "lineCount": 165,
+      "hash": "16745584c653a90f20e0d541ba297ffc104cf6478e3fabd11e4af8d833e59b44",
+      "moduleName": "classify"
+    },
+    {
+      "id": "lib/graph/fold.ts",
+      "path": "lib/graph/fold.ts",
+      "folder": "lib/graph",
+      "lineCount": 170,
+      "hash": "63fd0c5c7cbbc7699315610a715e2976ed37fbac2574402a334eb3152c3a9ace",
+      "moduleName": "fold"
+    },
+    {
+      "id": "lib/graph/layout.ts",
+      "path": "lib/graph/layout.ts",
+      "folder": "lib/graph",
+      "lineCount": 175,
+      "hash": "049748cc27c7a6922dcc54e1eb167a92743ca87f8871c8584a897f37dfbd0d53",
+      "moduleName": "layout"
+    },
+    {
       "id": "lib/org.ts",
       "path": "lib/org.ts",
       "folder": "lib",
@@ -117,15 +181,15 @@
       "path": "lib/parser/cli.ts",
       "folder": "lib/parser",
       "lineCount": 73,
-      "hash": "f33066de019f4c3535ecf2c3590b0ab7f95618d23e20d323d191a5bb8362066f",
+      "hash": "5adf0450a5945a9fa860799205c63f1137450ae1cd1fbac1f39e6a039fae9c22",
       "moduleName": "cli"
     },
     {
       "id": "lib/parser/index.ts",
       "path": "lib/parser/index.ts",
       "folder": "lib/parser",
-      "lineCount": 408,
-      "hash": "cc471198d1119777a93b0967c7b986d4688b9bc8debe16ae4cdb99fff5275a89",
+      "lineCount": 407,
+      "hash": "21ddf7723abc15fa56fadfb160b09410d0be7dca14b5f6a8bfee9c50e9417f3c",
       "moduleName": "index"
     },
     {
@@ -175,6 +239,14 @@
       "lineCount": 34,
       "hash": "ebbc91bc163ce492e3053f9cffbb36c416934520de28ea60ecb1387e97c9d6be",
       "moduleName": "run_seed_statements"
+    },
+    {
+      "id": "scratch/test-fold.ts",
+      "path": "scratch/test-fold.ts",
+      "folder": "scratch",
+      "lineCount": 13,
+      "hash": "4bbf318ad17a174684c091b301310192660bd591d8ae9388cbf0cc92deb7551f",
+      "moduleName": "test-fold"
     },
     {
       "id": "scratch/trpc/eslint.config.js",
@@ -8471,10 +8543,118 @@
       "specifier": "@/components/dashboard-view"
     },
     {
+      "source": "app/preview/page.tsx",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../../lib/parser/types"
+    },
+    {
+      "source": "app/preview/page.tsx",
+      "target": "components/workspace/workspace.tsx",
+      "kind": "import",
+      "specifier": "../../components/workspace/workspace"
+    },
+    {
+      "source": "components/canvas/folder-node.tsx",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../../lib/parser/types"
+    },
+    {
+      "source": "components/canvas/folder-node.tsx",
+      "target": "components/canvas/graph-canvas.tsx",
+      "kind": "import",
+      "specifier": "./graph-canvas"
+    },
+    {
+      "source": "components/canvas/folder-node.tsx",
+      "target": "lib/graph/layout.ts",
+      "kind": "import",
+      "specifier": "../../lib/graph/layout"
+    },
+    {
+      "source": "components/canvas/graph-canvas.tsx",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../../lib/parser/types"
+    },
+    {
+      "source": "components/canvas/graph-canvas.tsx",
+      "target": "lib/graph/fold.ts",
+      "kind": "import",
+      "specifier": "../../lib/graph/fold"
+    },
+    {
+      "source": "components/canvas/graph-canvas.tsx",
+      "target": "lib/graph/layout.ts",
+      "kind": "import",
+      "specifier": "../../lib/graph/layout"
+    },
+    {
+      "source": "components/canvas/graph-canvas.tsx",
+      "target": "components/canvas/folder-node.tsx",
+      "kind": "import",
+      "specifier": "./folder-node"
+    },
+    {
+      "source": "components/canvas/graph-canvas.tsx",
+      "target": "components/canvas/clamped-edge.tsx",
+      "kind": "import",
+      "specifier": "./clamped-edge"
+    },
+    {
       "source": "components/dashboard-view.tsx",
       "target": "lib/db/analyses.ts",
       "kind": "import",
       "specifier": "@/lib/db/analyses"
+    },
+    {
+      "source": "components/workspace/detail-pane.tsx",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../../lib/parser/types"
+    },
+    {
+      "source": "components/workspace/detail-pane.tsx",
+      "target": "components/canvas/graph-canvas.tsx",
+      "kind": "import",
+      "specifier": "../canvas/graph-canvas"
+    },
+    {
+      "source": "components/workspace/detail-pane.tsx",
+      "target": "lib/graph/fold.ts",
+      "kind": "import",
+      "specifier": "../../lib/graph/fold"
+    },
+    {
+      "source": "components/workspace/detail-pane.tsx",
+      "target": "lib/graph/classify.ts",
+      "kind": "import",
+      "specifier": "../../lib/graph/classify"
+    },
+    {
+      "source": "components/workspace/workspace.tsx",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../../lib/parser/types"
+    },
+    {
+      "source": "components/workspace/workspace.tsx",
+      "target": "lib/graph/fold.ts",
+      "kind": "import",
+      "specifier": "../../lib/graph/fold"
+    },
+    {
+      "source": "components/workspace/workspace.tsx",
+      "target": "components/canvas/graph-canvas.tsx",
+      "kind": "import",
+      "specifier": "../canvas/graph-canvas"
+    },
+    {
+      "source": "components/workspace/workspace.tsx",
+      "target": "components/workspace/detail-pane.tsx",
+      "kind": "import",
+      "specifier": "./detail-pane"
     },
     {
       "source": "lib/db/analyses.ts",
@@ -8487,6 +8667,24 @@
       "target": "lib/env.ts",
       "kind": "import",
       "specifier": "@/lib/env"
+    },
+    {
+      "source": "lib/graph/fold.ts",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../parser/types"
+    },
+    {
+      "source": "lib/graph/layout.ts",
+      "target": "lib/parser/types.ts",
+      "kind": "import",
+      "specifier": "../parser/types"
+    },
+    {
+      "source": "lib/graph/layout.ts",
+      "target": "lib/graph/fold.ts",
+      "kind": "import",
+      "specifier": "./fold"
     },
     {
       "source": "lib/parser/cli.ts",
@@ -8517,6 +8715,12 @@
       "target": "lib/env.ts",
       "kind": "import",
       "specifier": "@/lib/env"
+    },
+    {
+      "source": "scratch/test-fold.ts",
+      "target": "lib/graph/fold.ts",
+      "kind": "import",
+      "specifier": "../lib/graph/fold"
     },
     {
       "source": "scratch/trpc/examples/.experimental/next-app-dir/src/app/client/page.tsx",
@@ -17213,23 +17417,32 @@
     "app/preview/page.tsx": 0,
     "app/sign-in/[[...sign-in]]/page.tsx": 0,
     "app/sign-up/[[...sign-up]]/page.tsx": 0,
+    "components/canvas/clamped-edge.tsx": 1,
+    "components/canvas/folder-node.tsx": 1,
+    "components/canvas/graph-canvas.tsx": 3,
     "components/dashboard-view.tsx": 1,
     "components/org-sync.tsx": 1,
     "components/theme-toggle.tsx": 1,
+    "components/workspace/detail-pane.tsx": 1,
+    "components/workspace/workspace.tsx": 1,
     "eslint.config.mjs": 0,
     "lib/db/analyses.ts": 2,
     "lib/db/client.ts": 1,
     "lib/env.ts": 3,
+    "lib/graph/classify.ts": 1,
+    "lib/graph/fold.ts": 5,
+    "lib/graph/layout.ts": 2,
     "lib/org.ts": 1,
     "lib/parser/adapter.ts": 2,
     "lib/parser/cli.ts": 0,
     "lib/parser/index.ts": 1,
-    "lib/parser/types.ts": 1,
+    "lib/parser/types.ts": 8,
     "next.config.ts": 0,
     "postcss.config.mjs": 0,
     "proxy.ts": 0,
     "scratch/apply_seed.js": 0,
     "scratch/run_seed_statements.mjs": 0,
+    "scratch/test-fold.ts": 0,
     "scratch/trpc/eslint.config.js": 0,
     "scratch/trpc/examples/.experimental/next-app-dir/next.config.ts": 0,
     "scratch/trpc/examples/.experimental/next-app-dir/playwright.config.ts": 0,
@@ -18266,16 +18479,24 @@
   "fanOut": {
     "app/layout.tsx": 2,
     "app/page.tsx": 4,
-    "app/preview/page.tsx": 0,
+    "app/preview/page.tsx": 2,
     "app/sign-in/[[...sign-in]]/page.tsx": 0,
     "app/sign-up/[[...sign-up]]/page.tsx": 0,
+    "components/canvas/clamped-edge.tsx": 0,
+    "components/canvas/folder-node.tsx": 3,
+    "components/canvas/graph-canvas.tsx": 5,
     "components/dashboard-view.tsx": 1,
     "components/org-sync.tsx": 0,
     "components/theme-toggle.tsx": 0,
+    "components/workspace/detail-pane.tsx": 4,
+    "components/workspace/workspace.tsx": 4,
     "eslint.config.mjs": 0,
     "lib/db/analyses.ts": 1,
     "lib/db/client.ts": 1,
     "lib/env.ts": 0,
+    "lib/graph/classify.ts": 0,
+    "lib/graph/fold.ts": 1,
+    "lib/graph/layout.ts": 2,
     "lib/org.ts": 0,
     "lib/parser/adapter.ts": 0,
     "lib/parser/cli.ts": 2,
@@ -18286,6 +18507,7 @@
     "proxy.ts": 1,
     "scratch/apply_seed.js": 0,
     "scratch/run_seed_statements.mjs": 0,
+    "scratch/test-fold.ts": 1,
     "scratch/trpc/eslint.config.js": 0,
     "scratch/trpc/examples/.experimental/next-app-dir/next.config.ts": 0,
     "scratch/trpc/examples/.experimental/next-app-dir/playwright.config.ts": 0,
@@ -19320,9 +19542,9 @@
     "scratch/trpc/www/tailwind.config.ts": 0
   },
   "coverage": {
-    "totalFilesFound": 1739,
-    "totalFilesParsed": 1054,
-    "totalFilesSkipped": 685,
+    "totalFilesFound": 1751,
+    "totalFilesParsed": 1063,
+    "totalFilesSkipped": 688,
     "skippedFiles": [
       {
         "path": ".agents/skills/supabase/assets/feedback-issue-template.md",
@@ -19513,6 +19735,10 @@
         "reason": "Unsupported file extension: .css"
       },
       {
+        "path": "data/mock-repo.json",
+        "reason": "Unsupported file extension: .json"
+      },
+      {
         "path": "data/scaffold.json",
         "reason": "Unsupported file extension: .json"
       },
@@ -19534,6 +19760,14 @@
       },
       {
         "path": "docs/specs/phase-04.md",
+        "reason": "Unsupported file extension: .md"
+      },
+      {
+        "path": "docs/specs/phase-05.md",
+        "reason": "Unsupported file extension: .md"
+      },
+      {
+        "path": "docs/specs/phase-06.md",
         "reason": "Unsupported file extension: .md"
       },
       {
@@ -22065,10 +22299,10 @@
         "reason": "Unsupported file extension: .tsbuildinfo"
       }
     ],
-    "totalImports": 3819,
-    "resolvedImports": 1575,
-    "externalImports": 1951,
-    "excludedImports": 284,
+    "totalImports": 3855,
+    "resolvedImports": 1597,
+    "externalImports": 1955,
+    "excludedImports": 294,
     "unresolvedImports": 9,
     "reExportsFound": 288,
     "reExportsResolved": 284,
@@ -22158,6 +22392,34 @@
         "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
       },
       {
+        "source": "app/preview/page.tsx",
+        "specifier": "node:fs/promises",
+        "kind": "import",
+        "status": "external",
+        "reason": "Node builtin module: node:fs/promises"
+      },
+      {
+        "source": "app/preview/page.tsx",
+        "specifier": "node:path",
+        "kind": "import",
+        "status": "external",
+        "reason": "Node builtin module: node:path"
+      },
+      {
+        "source": "app/preview/page.tsx",
+        "specifier": "../../lib/parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "app/preview/page.tsx",
+        "specifier": "../../components/workspace/workspace",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/workspace/workspace.tsx"
+      },
+      {
         "source": "app/sign-in/[[...sign-in]]/page.tsx",
         "specifier": "@clerk/nextjs",
         "kind": "import",
@@ -22170,6 +22432,111 @@
         "kind": "import",
         "status": "excluded",
         "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@clerk+nextjs@7.9.11_next@1_7fd33d4480f07a8bfab16a5df1446921/node_modules/@clerk/nextjs/dist/types/index.d.ts"
+      },
+      {
+        "source": "components/canvas/clamped-edge.tsx",
+        "specifier": "react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
+      },
+      {
+        "source": "components/canvas/clamped-edge.tsx",
+        "specifier": "@xyflow/react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@xyflow+react@12.12.0_@type_b1941e0fb253a8b7302c0e22b6c2a559/node_modules/@xyflow/react/dist/esm/index.d.ts"
+      },
+      {
+        "source": "components/canvas/folder-node.tsx",
+        "specifier": "react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
+      },
+      {
+        "source": "components/canvas/folder-node.tsx",
+        "specifier": "@xyflow/react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@xyflow+react@12.12.0_@type_b1941e0fb253a8b7302c0e22b6c2a559/node_modules/@xyflow/react/dist/esm/index.d.ts"
+      },
+      {
+        "source": "components/canvas/folder-node.tsx",
+        "specifier": "../../lib/parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "components/canvas/folder-node.tsx",
+        "specifier": "./graph-canvas",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/canvas/graph-canvas.tsx"
+      },
+      {
+        "source": "components/canvas/folder-node.tsx",
+        "specifier": "../../lib/graph/layout",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/layout.ts"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "@xyflow/react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@xyflow+react@12.12.0_@type_b1941e0fb253a8b7302c0e22b6c2a559/node_modules/@xyflow/react/dist/esm/index.d.ts"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "@xyflow/react/dist/style.css",
+        "kind": "import",
+        "status": "external",
+        "reason": "Third-party external package: @xyflow/react/dist/style.css"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "../../lib/parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "../../lib/graph/fold",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/fold.ts"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "../../lib/graph/layout",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/layout.ts"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "./folder-node",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/canvas/folder-node.tsx"
+      },
+      {
+        "source": "components/canvas/graph-canvas.tsx",
+        "specifier": "./clamped-edge",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/canvas/clamped-edge.tsx"
       },
       {
         "source": "components/dashboard-view.tsx",
@@ -22198,6 +22565,76 @@
         "kind": "import",
         "status": "excluded",
         "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
+      },
+      {
+        "source": "components/workspace/detail-pane.tsx",
+        "specifier": "react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
+      },
+      {
+        "source": "components/workspace/detail-pane.tsx",
+        "specifier": "../../lib/parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "components/workspace/detail-pane.tsx",
+        "specifier": "../canvas/graph-canvas",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/canvas/graph-canvas.tsx"
+      },
+      {
+        "source": "components/workspace/detail-pane.tsx",
+        "specifier": "../../lib/graph/fold",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/fold.ts"
+      },
+      {
+        "source": "components/workspace/detail-pane.tsx",
+        "specifier": "../../lib/graph/classify",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/classify.ts"
+      },
+      {
+        "source": "components/workspace/workspace.tsx",
+        "specifier": "react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+react@19.3.0/node_modules/@types/react/index.d.ts"
+      },
+      {
+        "source": "components/workspace/workspace.tsx",
+        "specifier": "../../lib/parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "components/workspace/workspace.tsx",
+        "specifier": "../../lib/graph/fold",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/fold.ts"
+      },
+      {
+        "source": "components/workspace/workspace.tsx",
+        "specifier": "../canvas/graph-canvas",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/canvas/graph-canvas.tsx"
+      },
+      {
+        "source": "components/workspace/workspace.tsx",
+        "specifier": "./detail-pane",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "components/workspace/detail-pane.tsx"
       },
       {
         "source": "eslint.config.mjs",
@@ -22247,6 +22684,41 @@
         "kind": "import",
         "status": "resolved_internal",
         "target": "lib/env.ts"
+      },
+      {
+        "source": "lib/graph/fold.ts",
+        "specifier": "../parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "lib/graph/layout.ts",
+        "specifier": "dagre",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@types+dagre@0.7.54/node_modules/@types/dagre/index.d.ts"
+      },
+      {
+        "source": "lib/graph/layout.ts",
+        "specifier": "@xyflow/react",
+        "kind": "import",
+        "status": "excluded",
+        "reason": "Target file exists but was excluded from parse: node_modules/.pnpm/@xyflow+react@12.12.0_@type_b1941e0fb253a8b7302c0e22b6c2a559/node_modules/@xyflow/react/dist/esm/index.d.ts"
+      },
+      {
+        "source": "lib/graph/layout.ts",
+        "specifier": "../parser/types",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/parser/types.ts"
+      },
+      {
+        "source": "lib/graph/layout.ts",
+        "specifier": "./fold",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/fold.ts"
       },
       {
         "source": "lib/org.ts",
@@ -22387,6 +22859,20 @@
         "kind": "import",
         "status": "external",
         "reason": "Node builtin module: child_process"
+      },
+      {
+        "source": "scratch/test-fold.ts",
+        "specifier": "fs",
+        "kind": "import",
+        "status": "external",
+        "reason": "Node builtin module: fs"
+      },
+      {
+        "source": "scratch/test-fold.ts",
+        "specifier": "../lib/graph/fold",
+        "kind": "import",
+        "status": "resolved_internal",
+        "target": "lib/graph/fold.ts"
       },
       {
         "source": "scratch/trpc/eslint.config.js",
@@ -48815,8 +49301,11 @@
     "app/sign-in/[[...sign-in]]",
     "app/sign-up/[[...sign-up]]",
     "components",
+    "components/canvas",
+    "components/workspace",
     "lib",
     "lib/db",
+    "lib/graph",
     "lib/parser",
     "scratch",
     "scratch/trpc",

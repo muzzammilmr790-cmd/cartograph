@@ -62,9 +62,19 @@ export function classifyFile(filePath: string): FileKind {
     return 'Config';
   }
 
-  // Routes / Pages / Endpoints
+  // Routes / Pages / Endpoints / Framework Entry Points
   if (
-    (lower.includes('app/') && (fileName.startsWith('page.') || fileName.startsWith('route.') || fileName.startsWith('layout.') || fileName.startsWith('loading.') || fileName.startsWith('error.'))) ||
+    (lower.includes('app/') && (
+      fileName.startsWith('page.') ||
+      fileName.startsWith('route.') ||
+      fileName.startsWith('layout.') ||
+      fileName.startsWith('loading.') ||
+      fileName.startsWith('error.') ||
+      fileName.startsWith('not-found.') ||
+      fileName.startsWith('template.') ||
+      fileName.startsWith('default.')
+    )) ||
+    fileName.startsWith('middleware.') ||
     lower.includes('pages/') ||
     lower.includes('/routes/') ||
     lower.startsWith('routes/') ||
@@ -162,3 +172,13 @@ export function groupFilesByKind<T extends { path: string }>(files: T[]): Record
 
   return counts;
 }
+
+/**
+ * Returns true if a file is an entry point reached by the framework or configuration,
+ * such that having zero incoming imports is expected rather than an orphan.
+ */
+export function isFrameworkOrConfig(filePath: string): boolean {
+  const kind = classifyFile(filePath);
+  return kind === 'Route' || kind === 'Config' || kind === 'Test';
+}
+

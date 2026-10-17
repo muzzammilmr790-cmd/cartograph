@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
   ReactFlow,
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
   Node,
   Edge,
   NodeTypes,
@@ -20,6 +18,7 @@ import { FoldedNode } from "../../lib/graph/fold";
 import { generateGraph, getNodeRowHandle } from "../../lib/graph/layout";
 import { FolderNode } from "./folder-node";
 import { ClampedEdge } from "./clamped-edge";
+import { FileKind, classifyFile } from "../../lib/graph/classify";
 
 const nodeTypes: NodeTypes = {
   folderNode: FolderNode,
@@ -36,13 +35,20 @@ interface GraphCanvasProps {
   onSelectionChange: (s: SelectionState) => void;
   hoverState: SelectionState;
   onHoverChange: (s: SelectionState) => void;
+  selectedCategory?: FileKind | null;
 }
 
 export type SelectionState = { id: string; type: "node" | "file" } | null;
 
-function GraphCanvasInner({ data, foldedNodes, selection, onSelectionChange, hoverState, onHoverChange }: GraphCanvasProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+function GraphCanvasInner({
+  data,
+  foldedNodes,
+  selection,
+  onSelectionChange,
+  hoverState,
+  onHoverChange,
+  selectedCategory,
+}: GraphCanvasProps) {
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
   const pendingFitViewRef = React.useRef<{ maxZoom: number } | null>(null);
   
@@ -79,31 +85,49 @@ function GraphCanvasInner({ data, foldedNodes, selection, onSelectionChange, hov
     onSelectionChange(null);
   }, [onSelectionChange]);
 
-  // Compute layout whenever openFolders or data changes
-  useEffect(() => {
-    if (!data.files || data.files.length === 0) return;
+  const handleHoverFile = useCallback(
+    (id: string) => {
+      onHoverChange({ id, type: "file" });
+    },
+    [onHoverChange]
+  );
 
-    // 1. Generate layout from foldedNodes
-    const { nodes: layoutedNodes, edges: layoutedEdges } = generateGraph(
-      foldedNodes,
-      data.edges,
-      {
-        openFolders,
-        fanInMap: data.fanIn,
-        fanOutMap: data.fanOut,
-      }
-    );
+  const handleHoverLeave = useCallback(() => {
+    onHoverChange(null);
+  }, [onHoverChange]);
 
-    // 2. Compute active elements for dimming
+  // 1. Memoize Dagre layout so it ONLY re-computes when foldedNodes or openFolders change
+  const baseLayout = useMemo<{ nodes: Node[]; edges: Edge[] }>(() => {
+    if (!data.files || data.files.length === 0) return { nodes: [], edges: [] };
+    return generateGraph(foldedNodes, data.edges, {
+      openFolders,
+      fanInMap: data.fanIn,
+      fanOutMap: data.fanOut,
+    });
+  }, [foldedNodes, data.edges, openFolders, data.fanIn, data.fanOut, data.files]);
+
+  // 2. Synchronously compute styled nodes and edges during render (zero-delay, zero-flicker)
+  const { nodes, edges } = useMemo(() => {
+    if (!baseLayout.nodes.length) {
+      return { nodes: [], edges: [] };
+    }
+
     const activeNodeIds = new Set<string>();
     const activeEdgeIds = new Set<string>();
     const activeFileIds = new Set<string>();
 
+    const categoryCountsPerNode = new Map<string, number>();
+    if (selectedCategory) {
+      foldedNodes.forEach((fn) => {
+        const count = fn.files.filter((f) => classifyFile(f.path) === selectedCategory).length;
+        categoryCountsPerNode.set(fn.id, count);
+      });
+    }
+
     if (selection) {
       if (selection.type === "node") {
         activeNodeIds.add(selection.id);
-        // Find all edges connected to this node
-        layoutedEdges.forEach((e) => {
+        baseLayout.edges.forEach((e) => {
           if (e.source === selection.id || e.target === selection.id) {
             activeEdgeIds.add(e.id);
             activeNodeIds.add(e.source);
@@ -143,7 +167,7 @@ function GraphCanvasInner({ data, foldedNodes, selection, onSelectionChange, hov
     } else if (hoverState) {
       if (hoverState.type === "node") {
         activeNodeIds.add(hoverState.id);
-        layoutedEdges.forEach((e) => {
+        baseLayout.edges.forEach((e) => {
           if (e.source === hoverState.id || e.target === hoverState.id) {
             activeEdgeIds.add(e.id);
             activeNodeIds.add(e.source);
@@ -180,52 +204,72 @@ function GraphCanvasInner({ data, foldedNodes, selection, onSelectionChange, hov
           }
         });
       }
+    } else if (selectedCategory) {
+      foldedNodes.forEach((fn) => {
+        const count = categoryCountsPerNode.get(fn.id) ?? 0;
+        if (count > 0) {
+          activeNodeIds.add(fn.id);
+        }
+        fn.files.forEach((f) => {
+          if (classifyFile(f.path) === selectedCategory) {
+            activeFileIds.add(f.id);
+          }
+        });
+      });
+
+      baseLayout.edges.forEach((e) => {
+        if (activeNodeIds.has(e.source) && activeNodeIds.has(e.target)) {
+          activeEdgeIds.add(e.id);
+        }
+      });
     }
 
-    // 3. Attach callbacks and apply styles
-    const nodesWithCallbacks = layoutedNodes.map((n) => {
-      const isDimmed = (selection !== null || hoverState !== null) && !activeNodeIds.has(n.id);
+    const computedNodes = baseLayout.nodes.map((n) => {
+      const isDimmed = (selection !== null || hoverState !== null || selectedCategory !== null) && !activeNodeIds.has(n.id);
       return {
         ...n,
-        style: { ...n.style, opacity: isDimmed ? 0.2 : 1, transition: "opacity 0.2s" },
+        style: { ...n.style, opacity: isDimmed ? 0.2 : 1 },
         data: {
           ...n.data,
           onToggle: handleToggle,
           onSelectFile: handleSelectFile,
-          onHoverFile: (id: string) => onHoverChange({ id, type: "file" }),
-          onHoverLeave: () => onHoverChange(null),
+          onHoverFile: handleHoverFile,
+          onHoverLeave: handleHoverLeave,
           selection,
           hoverState,
           activeFileIds,
+          selectedCategory,
+          categoryMatchCount: categoryCountsPerNode.get(n.id) ?? 0,
         },
       };
     });
 
-    const edgesWithStyles = layoutedEdges.map((e) => {
-      const isDimmed = (selection !== null || hoverState !== null) && !activeEdgeIds.has(e.id);
+    const computedEdges = baseLayout.edges.map((e) => {
+      const isDimmed = (selection !== null || hoverState !== null || selectedCategory !== null) && !activeEdgeIds.has(e.id);
       return {
         ...e,
         style: {
           ...e.style,
           opacity: isDimmed ? 0.1 : 0.8,
           strokeWidth: isDimmed ? 1 : 2,
-          transition: "opacity 0.2s, stroke-width 0.2s",
         },
       };
     });
 
-    setNodes(nodesWithCallbacks);
-    setEdges(edgesWithStyles);
-
-    // If an open folder triggered a layout change, refit the view safely
-    if (pendingFitViewRef.current) {
-      const { maxZoom } = pendingFitViewRef.current;
-      pendingFitViewRef.current = null;
-      setTimeout(() => {
-        fitView({ duration: 400, padding: 0.15, maxZoom });
-      }, 50);
-    }
-  }, [data, foldedNodes, openFolders, selection, hoverState, handleToggle, handleSelectFile, onHoverChange, setNodes, setEdges, fitView]);
+    return { nodes: computedNodes, edges: computedEdges };
+  }, [
+    baseLayout,
+    data.edges,
+    foldedNodes,
+    openFolders,
+    selection,
+    hoverState,
+    selectedCategory,
+    handleToggle,
+    handleSelectFile,
+    handleHoverFile,
+    handleHoverLeave,
+  ]);
 
   const hasInitialFitRef = React.useRef(false);
 
@@ -239,18 +283,31 @@ function GraphCanvasInner({ data, foldedNodes, selection, onSelectionChange, hov
     }
   }, [nodes.length, fitView]);
 
+  // Refit on folder open
+  useEffect(() => {
+    if (pendingFitViewRef.current) {
+      const { maxZoom } = pendingFitViewRef.current;
+      pendingFitViewRef.current = null;
+      setTimeout(() => {
+        fitView({ duration: 400, padding: 0.15, maxZoom });
+      }, 50);
+    }
+  }, [openFolders, fitView]);
+
   return (
     <ReactFlow
       nodes={nodes}
       edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
       onNodeClick={onNodeClick}
       onPaneClick={onPaneClick}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       minZoom={0.1}
       maxZoom={2}
+      nodesDraggable={false}
+      nodesConnectable={false}
+      nodesFocusable={false}
+      elementsSelectable={false}
     >
       <Background color="var(--border)" gap={20} size={1} />
       <Controls showInteractive={false} />
@@ -258,7 +315,15 @@ function GraphCanvasInner({ data, foldedNodes, selection, onSelectionChange, hov
   );
 }
 
-export function GraphCanvas({ data, foldedNodes, selection, onSelectionChange, hoverState, onHoverChange }: GraphCanvasProps) {
+export function GraphCanvas({
+  data,
+  foldedNodes,
+  selection,
+  onSelectionChange,
+  hoverState,
+  onHoverChange,
+  selectedCategory,
+}: GraphCanvasProps) {
   return (
     <ReactFlowProvider>
       <GraphCanvasInner 
@@ -268,6 +333,7 @@ export function GraphCanvas({ data, foldedNodes, selection, onSelectionChange, h
         onSelectionChange={onSelectionChange} 
         hoverState={hoverState}
         onHoverChange={onHoverChange}
+        selectedCategory={selectedCategory}
       />
     </ReactFlowProvider>
   );

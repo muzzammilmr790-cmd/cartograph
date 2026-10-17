@@ -16,31 +16,6 @@ export default async function PreviewPage() {
 
   return (
     <div className="flex flex-1 h-[calc(100vh-3rem)] overflow-hidden bg-background text-foreground">
-      {/* Left Rail: Categories */}
-      <aside className="w-64 border-r border-border bg-surface/50 p-3 flex flex-col gap-3 shrink-0">
-        <div className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-500">
-          Categories
-        </div>
-        <div className="flex flex-col gap-2">
-          {/* Static scaffolding for categories */}
-          <div className="flex items-center justify-between text-xs font-mono p-2 border border-border rounded bg-surface/80">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
-              <span>Components</span>
-            </div>
-            <span className="text-zinc-500">24</span>
-          </div>
-          <div className="flex items-center justify-between text-xs font-mono p-2 border border-border rounded bg-surface/80">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span>Utilities</span>
-            </div>
-            <span className="text-zinc-500">12</span>
-          </div>
-        </div>
-      </aside>
-
-      {/* Workspace (Canvas + Detail Pane) */}
       {mockData ? (
         <Workspace data={mockData} />
       ) : (

@@ -23,8 +23,7 @@ function getClosedNodeHeight(files: ParsedFile[], fanInMap: Record<string, numbe
 }
 
 function getOpenNodeHeight(files: ParsedFile[]): number {
-  const hasMore = files.length > MAX_ROWS;
-  const displayCount = Math.min(files.length, MAX_ROWS) + (hasMore ? 1 : 0);
+  const displayCount = Math.min(files.length, MAX_ROWS);
   return HEADER_HEIGHT + displayCount * ROW_HEIGHT;
 }
 
@@ -43,12 +42,11 @@ export function getNodeRowHandle(
   type: "source" | "target"
 ): string | null {
   if (!isOpen) return null;
-  const visibleFiles = filesInNode.slice(0, MAX_ROWS);
-  const isVisible = visibleFiles.some((f) => f.id === fileId);
-  if (isVisible) {
+  const isPresent = filesInNode.some((f) => f.id === fileId);
+  if (isPresent) {
     return `${type}-${fileId}`;
   }
-  return `${type}-${nodeId}-more`;
+  return null;
 }
 
 export function generateGraph(

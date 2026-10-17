@@ -1,8 +1,8 @@
-import React from "react";
-import { Handle, Position } from "@xyflow/react";
+import React, { useCallback, useRef, useEffect } from "react";
+import { Handle, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { ParsedFile } from "../../lib/parser/types";
 import { SelectionState } from "./graph-canvas";
-import { MAX_ROWS } from "../../lib/graph/layout";
+import { FileKind, classifyFile } from "../../lib/graph/classify";
 
 interface FolderNodeData {
   id: string;
@@ -11,6 +11,8 @@ interface FolderNodeData {
   isOpen: boolean;
   totalFanIn: number;
   totalFanOut: number;
+  selectedCategory?: FileKind | null;
+  categoryMatchCount?: number;
   onToggle: (id: string) => void;
   onSelectFile: (id: string) => void;
   selection: SelectionState;
@@ -20,40 +22,79 @@ interface FolderNodeData {
   onHoverLeave: () => void;
 }
 
-export function FolderNode({ data }: { data: FolderNodeData }) {
-  const { id, label, files, isOpen, totalFanIn, totalFanOut, onToggle, onSelectFile, selection, hoverState, activeFileIds, onHoverFile, onHoverLeave } = data;
+export const FolderNode = React.memo(function FolderNode({ data }: { data: FolderNodeData }) {
+  const {
+    id,
+    label,
+    files,
+    isOpen,
+    totalFanIn,
+    totalFanOut,
+    selectedCategory,
+    categoryMatchCount,
+    onToggle,
+    onSelectFile,
+    selection,
+    hoverState,
+    activeFileIds,
+    onHoverFile,
+    onHoverLeave,
+  } = data;
+
+  const updateNodeInternals = useUpdateNodeInternals();
+  const rafRef = useRef<number | null>(null);
+
+  const handleScroll = useCallback(() => {
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      updateNodeInternals(id);
+      rafRef.current = null;
+    });
+  }, [id, updateNodeInternals]);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   // Node selection status
   const isNodeSelected = selection?.type === "node" && selection.id === id;
 
+  const matchCount = selectedCategory
+    ? (categoryMatchCount ?? files.filter((f) => classifyFile(f.path) === selectedCategory).length)
+    : undefined;
+
   if (!isOpen) {
     return (
       <div 
-        className={`w-full h-full border bg-surface hover:bg-surface-hover rounded-md flex flex-col justify-center items-center cursor-pointer transition-colors relative ${
+        className={`w-full h-full border bg-surface hover:bg-surface-hover rounded-md flex flex-col justify-center items-center cursor-pointer relative ${
           isNodeSelected ? "border-accent ring-1 ring-accent" : "border-border"
         }`}
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           onToggle(id);
         }}
       >
-        <Handle type="target" position={Position.Left} className="opacity-0" />
+        <Handle type="target" position={Position.Left} className="opacity-0 pointer-events-none" />
         <div className="text-xs font-mono font-semibold truncate px-2 text-center w-full">
           {label}
         </div>
-        <div className="text-[10px] font-mono text-zinc-500 mt-1">
-          {files.length} files
+        <div className="text-[10px] font-mono mt-1">
+          {matchCount !== undefined ? (
+            <span className={matchCount > 0 ? "text-accent font-semibold" : "text-zinc-500"}>
+              {matchCount} matched · {files.length} files
+            </span>
+          ) : (
+            <span className="text-zinc-500">{files.length} files</span>
+          )}
         </div>
-        <Handle type="source" position={Position.Right} className="opacity-0" />
+        <Handle type="source" position={Position.Right} className="opacity-0 pointer-events-none" />
       </div>
     );
   }
-
-  const visibleFiles = files.slice(0, MAX_ROWS);
-  const remainingCount = files.length - MAX_ROWS;
-  const isRemainingActive = remainingCount > 0 && files.slice(MAX_ROWS).some(
-    (f) => (selection?.type === "file" && selection.id === f.id) || (hoverState?.type === "file" && hoverState.id === f.id)
-  );
-  const isRemainingDimmed = (selection?.type === "file" || hoverState?.type === "file") && !isRemainingActive;
 
   return (
     <div className={`w-full h-full border bg-background rounded-md flex flex-col overflow-hidden shadow-sm ${
@@ -69,7 +110,14 @@ export function FolderNode({ data }: { data: FolderNodeData }) {
       >
         <div className="flex items-center gap-2 overflow-hidden mr-2">
           <span className="text-xs font-mono font-semibold truncate" title={label}>{label}</span>
-          <span className="text-[10px] font-mono text-zinc-500 shrink-0">{files.length} files</span>
+          <span className="text-[10px] font-mono text-zinc-500 shrink-0">
+            {matchCount !== undefined ? (
+              <span className={matchCount > 0 ? "text-accent font-semibold" : ""}>
+                {matchCount} matched ·{" "}
+              </span>
+            ) : null}
+            {files.length} files
+          </span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[10px] font-mono text-incoming" title="Incoming dependencies">↓{totalFanIn}</span>
@@ -77,12 +125,17 @@ export function FolderNode({ data }: { data: FolderNodeData }) {
         </div>
       </div>
 
-      {/* Rows */}
-      <div className="flex-1 flex flex-col">
-        {visibleFiles.map((file) => {
+      {/* Scrollable Rows */}
+      <div 
+        className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden nowheel nodrag node-scrollbar"
+        onScroll={handleScroll}
+      >
+        {files.map((file) => {
           let isRowDimmed = false;
           let isRowSelected = false;
           let isRowHovered = false;
+
+          const matchesCategory = selectedCategory ? classifyFile(file.path) === selectedCategory : true;
 
           if (selection?.type === "file") {
             isRowDimmed = !activeFileIds.has(file.id);
@@ -90,15 +143,23 @@ export function FolderNode({ data }: { data: FolderNodeData }) {
           } else if (hoverState?.type === "file") {
             isRowDimmed = !activeFileIds.has(file.id);
             isRowHovered = hoverState.id === file.id;
+          } else if (selectedCategory) {
+            isRowDimmed = !matchesCategory;
           }
 
           return (
             <div 
               key={file.id} 
-              className={`h-7 border-b border-border last:border-0 flex items-center px-3 cursor-pointer relative transition-colors ${
-                isRowSelected ? "bg-accent/15" : isRowHovered ? "bg-surface" : "hover:bg-surface/50"
+              className={`h-7 min-h-[28px] shrink-0 border-b border-border/40 last:border-0 flex items-center px-3 cursor-pointer relative select-none ${
+                isRowSelected
+                  ? "bg-accent/15"
+                  : isRowHovered
+                  ? "bg-surface"
+                  : selectedCategory && matchesCategory
+                  ? "bg-accent/5 hover:bg-surface/50"
+                  : "hover:bg-surface/50"
               }`}
-              style={{ opacity: isRowDimmed ? 0.3 : 1 }}
+              style={{ opacity: isRowDimmed ? 0.25 : 1 }}
               onClick={(e) => {
                 e.stopPropagation();
                 onSelectFile(file.id);
@@ -110,46 +171,29 @@ export function FolderNode({ data }: { data: FolderNodeData }) {
                 type="target" 
                 position={Position.Left} 
                 id={`target-${file.id}`} 
-                className="w-2 h-2 bg-incoming border-none -ml-1 rounded-sm opacity-60" 
+                className="w-2 h-2 bg-incoming border-none -ml-1 rounded-sm opacity-60 pointer-events-none" 
               />
-              <span className={`text-[11px] font-mono truncate w-full ${isRowSelected ? "font-semibold text-accent" : ""} ${isRowHovered && !isRowSelected ? "font-medium" : ""}`} title={file.moduleName}>
+              <span 
+                className={`text-[11px] font-mono truncate w-full pointer-events-none ${
+                  isRowSelected ? "font-semibold text-accent" : ""
+                } ${isRowHovered && !isRowSelected ? "font-medium" : ""} ${
+                  selectedCategory && matchesCategory && !isRowSelected ? "text-accent font-medium" : ""
+                }`} 
+                title={file.moduleName}
+              >
                 {file.moduleName}
               </span>
               <Handle 
                 type="source" 
                 position={Position.Right} 
                 id={`source-${file.id}`} 
-                className="w-2 h-2 bg-outgoing border-none -mr-1 rounded-sm opacity-60" 
+                className="w-2 h-2 bg-outgoing border-none -mr-1 rounded-sm opacity-60 pointer-events-none" 
               />
             </div>
           );
         })}
-
-        {remainingCount > 0 && (
-          <div 
-            className={`h-7 border-t border-border/80 flex items-center justify-between px-3 relative select-none transition-colors ${
-              isRemainingActive ? "bg-accent/15 text-accent font-semibold" : "bg-surface/40 text-zinc-500"
-            }`}
-            style={{ opacity: isRemainingDimmed ? 0.3 : 1 }}
-          >
-            <Handle 
-              type="target" 
-              position={Position.Left} 
-              id={`target-${id}-more`} 
-              className="w-2 h-2 bg-incoming border-none -ml-1 rounded-sm opacity-60" 
-            />
-            <span className="text-[10px] font-mono italic">
-              +{remainingCount} more files
-            </span>
-            <Handle 
-              type="source" 
-              position={Position.Right} 
-              id={`source-${id}-more`} 
-              className="w-2 h-2 bg-outgoing border-none -mr-1 rounded-sm opacity-60" 
-            />
-          </div>
-        )}
       </div>
     </div>
   );
-}
+});
+

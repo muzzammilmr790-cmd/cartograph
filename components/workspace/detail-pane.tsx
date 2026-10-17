@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { ParseResult } from "../../lib/parser/types";
 import { SelectionState } from "../canvas/graph-canvas";
 import { FoldedNode } from "../../lib/graph/fold";
 import { classifyFile, groupFilesByKind, KIND_METADATA, FileKind } from "../../lib/graph/classify";
+import { walkTransitive } from "../../lib/graph/traversal";
 
 interface DetailPaneProps {
   data: ParseResult;
@@ -19,6 +20,7 @@ type Tab = "structure" | "explanation";
 
 export function DetailPane({ data, foldedNodes, selection, onSelectionChange, hoverState, onHoverChange }: DetailPaneProps) {
   const [activeTab, setActiveTab] = useState<Tab>("structure");
+  const [activeWalk, setActiveWalk] = useState<"incoming" | "outgoing" | null>(null);
 
   // Summaries when nothing is selected
   const repoSummary = useMemo(() => {
@@ -87,18 +89,34 @@ export function DetailPane({ data, foldedNodes, selection, onSelectionChange, ho
     return { imports, importedBy };
   }, [data.edges, selectedFile]);
 
+  const blastRadius = useMemo(() => {
+    if (!selectedFile) return [];
+    return walkTransitive(data.edges, selectedFile.id, "incoming", 2);
+  }, [data.edges, selectedFile]);
+
+  const dependencyChain = useMemo(() => {
+    if (!selectedFile) return [];
+    return walkTransitive(data.edges, selectedFile.id, "outgoing", 2);
+  }, [data.edges, selectedFile]);
+
   // Click handler
-  const handleFileClick = (id: string) => {
-    onSelectionChange({ id, type: "file" });
-  };
+  const handleFileClick = useCallback(
+    (id: string) => {
+      onSelectionChange({ id, type: "file" });
+    },
+    [onSelectionChange]
+  );
 
-  const handleMouseEnter = (id: string) => {
-    onHoverChange({ id, type: "file" });
-  };
+  const handleMouseEnter = useCallback(
+    (id: string) => {
+      onHoverChange({ id, type: "file" });
+    },
+    [onHoverChange]
+  );
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     onHoverChange(null);
-  };
+  }, [onHoverChange]);
 
   const isHovered = (id: string) => hoverState?.id === id;
 
@@ -134,7 +152,7 @@ export function DetailPane({ data, foldedNodes, selection, onSelectionChange, ho
             <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
               Most Depended On
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
               {repoSummary?.sortedByFanIn.map((f) => (
                 <div 
                   key={f.id} 
@@ -154,7 +172,7 @@ export function DetailPane({ data, foldedNodes, selection, onSelectionChange, ho
             <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
               Entry Points (0 In)
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
               {repoSummary?.unimported.slice(0, 15).map((f) => (
                 <div 
                   key={f.id} 
@@ -276,7 +294,7 @@ export function DetailPane({ data, foldedNodes, selection, onSelectionChange, ho
                   <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
                     Files ({selectedFolderNode.files.length})
                   </div>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 max-h-72 overflow-y-auto pr-1">
                     {selectedFolderNode.files.map((f) => {
                       const fKind = classifyFile(f.path);
                       const fMeta = KIND_METADATA[fKind];
@@ -300,15 +318,118 @@ export function DetailPane({ data, foldedNodes, selection, onSelectionChange, ho
 
             {selection.type === "file" && fileDependencies && (
               <>
+                {/* Blast Radius & Dependency Chain Action Buttons */}
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveWalk(activeWalk === "incoming" ? null : "incoming")}
+                      className={`py-1.5 px-2 text-xs font-mono rounded border transition-colors cursor-pointer text-center ${
+                        activeWalk === "incoming"
+                          ? "bg-accent/20 border-accent text-accent font-semibold"
+                          : "bg-surface border-border text-foreground hover:bg-surface-hover"
+                      }`}
+                      title="Transitive walk: everything that breaks if this file changes (2 levels)"
+                    >
+                      Blast radius
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveWalk(activeWalk === "outgoing" ? null : "outgoing")}
+                      className={`py-1.5 px-2 text-xs font-mono rounded border transition-colors cursor-pointer text-center ${
+                        activeWalk === "outgoing"
+                          ? "bg-accent/20 border-accent text-accent font-semibold"
+                          : "bg-surface border-border text-foreground hover:bg-surface-hover"
+                      }`}
+                      title="Transitive walk: everything this file needs (2 levels)"
+                    >
+                      Dependency chain
+                    </button>
+                  </div>
+                </div>
+
+                {/* Transitive Walk Result Section */}
+                {activeWalk === "incoming" && (
+                  <div className="flex flex-col gap-2 border border-accent/30 bg-accent/5 p-2.5 rounded">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-accent">
+                        Blast Radius ({blastRadius.length})
+                      </div>
+                      <span className="text-[10px] font-mono text-zinc-400">2 levels</span>
+                    </div>
+                    <p className="text-[11px] font-mono text-zinc-400">
+                      Everything that breaks if this file changes.
+                    </p>
+                    {blastRadius.length === 0 ? (
+                      <span className="text-xs font-mono text-zinc-500">No transitive dependents within 2 levels.</span>
+                    ) : (
+                      <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-0.5">
+                        {blastRadius.map((item) => (
+                          <div
+                            key={item.fileId}
+                            className={`flex items-center justify-between text-xs font-mono p-1.5 rounded cursor-pointer transition-colors ${
+                              isHovered(item.fileId) ? "bg-surface border border-border" : "hover:bg-surface/50 border border-transparent"
+                            }`}
+                            onClick={() => handleFileClick(item.fileId)}
+                            onMouseEnter={() => handleMouseEnter(item.fileId)}
+                            onMouseLeave={handleMouseLeave}
+                          >
+                            <span className="truncate text-blue-400 pr-2">{item.fileId}</span>
+                            <span className="text-[10px] font-mono px-1 py-0.5 rounded bg-surface border border-border text-zinc-400 shrink-0">
+                              L{item.depth}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeWalk === "outgoing" && (
+                  <div className="flex flex-col gap-2 border border-accent/30 bg-accent/5 p-2.5 rounded">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-accent">
+                        Dependency Chain ({dependencyChain.length})
+                      </div>
+                      <span className="text-[10px] font-mono text-zinc-400">2 levels</span>
+                    </div>
+                    <p className="text-[11px] font-mono text-zinc-400">
+                      Everything this file needs.
+                    </p>
+                    {dependencyChain.length === 0 ? (
+                      <span className="text-xs font-mono text-zinc-500">No transitive dependencies within 2 levels.</span>
+                    ) : (
+                      <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-0.5">
+                        {dependencyChain.map((item) => (
+                          <div
+                            key={item.fileId}
+                            className={`flex items-center justify-between text-xs font-mono p-1.5 rounded cursor-pointer transition-colors ${
+                              isHovered(item.fileId) ? "bg-surface border border-border" : "hover:bg-surface/50 border border-transparent"
+                            }`}
+                            onClick={() => handleFileClick(item.fileId)}
+                            onMouseEnter={() => handleMouseEnter(item.fileId)}
+                            onMouseLeave={handleMouseLeave}
+                          >
+                            <span className="truncate text-blue-400 pr-2">{item.fileId}</span>
+                            <span className="text-[10px] font-mono px-1 py-0.5 rounded bg-surface border border-border text-zinc-400 shrink-0">
+                              L{item.depth}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-2">
                   <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500 flex justify-between">
-                    <span>Imports</span>
+                    <span>Direct Imports</span>
                     <span>{fileDependencies.imports.length}</span>
                   </div>
                   {fileDependencies.imports.length === 0 ? (
                     <span className="text-xs font-mono text-zinc-500">None</span>
                   ) : (
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
                       {fileDependencies.imports.map((depId) => (
                         <div 
                           key={depId} 
@@ -326,13 +447,13 @@ export function DetailPane({ data, foldedNodes, selection, onSelectionChange, ho
 
                 <div className="flex flex-col gap-2">
                   <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500 flex justify-between">
-                    <span>Imported By</span>
+                    <span>Directly Imported By</span>
                     <span>{fileDependencies.importedBy.length}</span>
                   </div>
                   {fileDependencies.importedBy.length === 0 ? (
                     <span className="text-xs font-mono text-zinc-500">None</span>
                   ) : (
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
                       {fileDependencies.importedBy.map((depId) => (
                         <div 
                           key={depId} 
