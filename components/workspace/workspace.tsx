@@ -8,6 +8,7 @@ import { FileKind } from "../../lib/graph/classify";
 import { SelectionState } from "../canvas/graph-canvas";
 import { DetailPane } from "./detail-pane";
 import { LeftRail } from "./left-rail";
+import { CoverageBanner } from "../canvas/coverage-banner";
 
 const GraphCanvas = dynamic(
   () => import("../canvas/graph-canvas").then((mod) => mod.GraphCanvas),
@@ -82,6 +83,7 @@ export function Workspace({ data }: WorkspaceProps) {
 
       {/* Middle Column: The Map (Canvas) */}
       <main className="flex-1 bg-background flex flex-col overflow-hidden relative">
+        {data.coverage && <CoverageBanner coverage={data.coverage} />}
         <GraphCanvas 
           data={data} 
           foldedNodes={foldedNodes}

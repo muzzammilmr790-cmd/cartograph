@@ -124,56 +124,65 @@ ALTER TABLE public.explanations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.file_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.insights ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to read active organization ID from Clerk JWT claims (supports org_id and o ->> id)
+CREATE OR REPLACE FUNCTION public.requesting_org_id()
+RETURNS text
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT nullif(coalesce(auth.jwt()->>'org_id', auth.jwt()->'o'->>'id'), '')::text;
+$$;
+
 -- Policies for Organizations
-CREATE POLICY "org_select_policy" ON public.organizations FOR SELECT TO authenticated USING (id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "org_insert_policy" ON public.organizations FOR INSERT TO authenticated WITH CHECK (id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "org_update_policy" ON public.organizations FOR UPDATE TO authenticated USING (id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "org_delete_policy" ON public.organizations FOR DELETE TO authenticated USING (id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "org_select_policy" ON public.organizations FOR SELECT TO authenticated USING (id = public.requesting_org_id());
+CREATE POLICY "org_insert_policy" ON public.organizations FOR INSERT TO authenticated WITH CHECK (id = public.requesting_org_id());
+CREATE POLICY "org_update_policy" ON public.organizations FOR UPDATE TO authenticated USING (id = public.requesting_org_id()) WITH CHECK (id = public.requesting_org_id());
+CREATE POLICY "org_delete_policy" ON public.organizations FOR DELETE TO authenticated USING (id = public.requesting_org_id());
 
 -- Policies for Projects
-CREATE POLICY "projects_select_policy" ON public.projects FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "projects_insert_policy" ON public.projects FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "projects_update_policy" ON public.projects FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "projects_delete_policy" ON public.projects FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "projects_select_policy" ON public.projects FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "projects_insert_policy" ON public.projects FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "projects_update_policy" ON public.projects FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "projects_delete_policy" ON public.projects FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for Analyses
-CREATE POLICY "analyses_select_policy" ON public.analyses FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "analyses_insert_policy" ON public.analyses FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "analyses_update_policy" ON public.analyses FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "analyses_delete_policy" ON public.analyses FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "analyses_select_policy" ON public.analyses FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "analyses_insert_policy" ON public.analyses FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "analyses_update_policy" ON public.analyses FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "analyses_delete_policy" ON public.analyses FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for Files
-CREATE POLICY "files_select_policy" ON public.files FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "files_insert_policy" ON public.files FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "files_update_policy" ON public.files FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "files_delete_policy" ON public.files FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "files_select_policy" ON public.files FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "files_insert_policy" ON public.files FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "files_update_policy" ON public.files FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "files_delete_policy" ON public.files FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for Edges
-CREATE POLICY "edges_select_policy" ON public.edges FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "edges_insert_policy" ON public.edges FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "edges_update_policy" ON public.edges FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "edges_delete_policy" ON public.edges FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "edges_select_policy" ON public.edges FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "edges_insert_policy" ON public.edges FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "edges_update_policy" ON public.edges FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "edges_delete_policy" ON public.edges FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for Routes
-CREATE POLICY "routes_select_policy" ON public.routes FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "routes_insert_policy" ON public.routes FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "routes_update_policy" ON public.routes FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "routes_delete_policy" ON public.routes FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "routes_select_policy" ON public.routes FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "routes_insert_policy" ON public.routes FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "routes_update_policy" ON public.routes FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "routes_delete_policy" ON public.routes FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for Explanations
-CREATE POLICY "explanations_select_policy" ON public.explanations FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "explanations_insert_policy" ON public.explanations FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "explanations_update_policy" ON public.explanations FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "explanations_delete_policy" ON public.explanations FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "explanations_select_policy" ON public.explanations FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "explanations_insert_policy" ON public.explanations FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "explanations_update_policy" ON public.explanations FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "explanations_delete_policy" ON public.explanations FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for File Roles
-CREATE POLICY "file_roles_select_policy" ON public.file_roles FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "file_roles_insert_policy" ON public.file_roles FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "file_roles_update_policy" ON public.file_roles FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "file_roles_delete_policy" ON public.file_roles FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "file_roles_select_policy" ON public.file_roles FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "file_roles_insert_policy" ON public.file_roles FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "file_roles_update_policy" ON public.file_roles FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "file_roles_delete_policy" ON public.file_roles FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());
 
 -- Policies for Insights
-CREATE POLICY "insights_select_policy" ON public.insights FOR SELECT TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "insights_insert_policy" ON public.insights FOR INSERT TO authenticated WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "insights_update_policy" ON public.insights FOR UPDATE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id')) WITH CHECK (organization_id = (SELECT auth.jwt() ->> 'org_id'));
-CREATE POLICY "insights_delete_policy" ON public.insights FOR DELETE TO authenticated USING (organization_id = (SELECT auth.jwt() ->> 'org_id'));
+CREATE POLICY "insights_select_policy" ON public.insights FOR SELECT TO authenticated USING (organization_id = public.requesting_org_id());
+CREATE POLICY "insights_insert_policy" ON public.insights FOR INSERT TO authenticated WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "insights_update_policy" ON public.insights FOR UPDATE TO authenticated USING (organization_id = public.requesting_org_id()) WITH CHECK (organization_id = public.requesting_org_id());
+CREATE POLICY "insights_delete_policy" ON public.insights FOR DELETE TO authenticated USING (organization_id = public.requesting_org_id());

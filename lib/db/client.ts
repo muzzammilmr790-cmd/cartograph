@@ -9,9 +9,18 @@ import { env } from "@/lib/env";
  * Supabase auth session persistence and auto-refresh are disabled (`persistSession: false`)
  * to prevent double-session conflicts.
  */
-export async function createDbClient() {
-  const { getToken } = await auth();
-  const token = await getToken();
+export async function createDbClient(tokenOverride?: string) {
+  let token = tokenOverride;
+
+  if (!token) {
+    try {
+      const { getToken } = await auth();
+      token = (await getToken()) ?? undefined;
+    } catch {
+      // Outside request context (e.g., CLI or background script)
+      token = undefined;
+    }
+  }
 
   return createClient(
     env.NEXT_PUBLIC_SUPABASE_URL,

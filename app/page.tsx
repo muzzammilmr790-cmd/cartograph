@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getOrProvisionCurrentOrg } from "@/lib/org";
 import { syncCurrentOrgToDb, getAnalyses, type AnalysisRecord } from "@/lib/db/analyses";
 import { OrgSync } from "@/components/org-sync";
@@ -60,9 +61,10 @@ export default async function Home() {
           ) : (
             <div className="flex flex-col gap-1.5 overflow-y-auto">
               {analyses.map((a) => (
-                <div
+                <Link
                   key={a.id}
-                  className="border border-border rounded p-2 text-xs font-mono bg-surface/80 flex flex-col gap-1"
+                  href={`/analysis/${a.id}`}
+                  className="border border-border rounded p-2 text-xs font-mono bg-surface/80 hover:bg-surface hover:border-zinc-500/50 transition-all flex flex-col gap-1 cursor-pointer"
                 >
                   <span className="font-medium text-foreground truncate">
                     {a.repo_url.replace("https://github.com/", "")}
@@ -71,7 +73,7 @@ export default async function Home() {
                     <span className="capitalize">{a.status}</span>
                     <span>{a.file_count} files</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
